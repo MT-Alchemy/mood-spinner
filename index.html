@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mood Spinner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: game-show stage — sunburst behind a lit-rim wheel, pointer on top, spin button in the hub and below, recent-spins strip, then a mood-coloured result card. One bright look on purpose. */
+:root {
+  color-scheme: light;
+  --bg: #fff4dc;
+  --ray: #ffe7b3;
+  --ink: #2b2140;
+  --ink-soft: #6a5f80;
+  --card: #ffffff;
+  --rim: #2b2140;
+  --bulb-on: #fff6a8;
+  --bulb-off: #8a7aa8;
+  --btn: #ff4f6d;
+  --btn-dark: #c22d49;
+  --font-display: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 28px;
+  overflow-x: hidden;
+  position: relative;
+}
+body::after {
+  content: ""; position: fixed; left: 50%; top: 46%; width: 220vmax; height: 220vmax;
+  transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(var(--ray) 0deg 10deg, transparent 10deg 20deg);
+  z-index: -1; pointer-events: none;
+  animation: rays 80s linear infinite;
+  -webkit-mask-image: radial-gradient(circle, #000 0, #000 18%, transparent 46%);
+          mask-image: radial-gradient(circle, #000 0, #000 18%, transparent 46%);
+}
+@keyframes rays { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+main {
+  max-width: 480px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  text-align: center;
+}
+.topbar { width: 100%; display: flex; justify-content: flex-end; }
+.sound {
+  font: 700 0.85rem var(--font-body); color: var(--ink);
+  background: var(--card); border: 2px solid var(--ink); border-radius: 999px;
+  padding: 5px 12px; cursor: pointer; box-shadow: 0 3px 0 var(--ink);
+}
+.sound:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+header { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: -8px; }
+.eyebrow {
+  margin: 0; font-weight: 800; font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase;
+  background: var(--ink); color: var(--bulb-on); padding: 4px 12px 3px; border-radius: 999px;
+}
+h1 {
+  font-family: var(--font-display); font-weight: 800; margin: 2px 0 0;
+  font-size: clamp(2.5rem, 11vw, 3.4rem); line-height: 0.95; letter-spacing: 0.01em;
+  color: var(--btn); text-shadow: 3px 3px 0 var(--ink);
+  -webkit-text-stroke: 1.5px var(--ink);
+  text-wrap: balance;
+}
+.lead { margin: 4px 0 0; color: var(--ink-soft); font-weight: 700; font-size: 1rem; }
+
+.stage { position: relative; width: min(92vw, 420px); max-width: 100%; aspect-ratio: 1; margin-top: 10px; }
+.stage canvas { width: 100%; height: 100%; display: block; filter: drop-shadow(0 12px 0 rgba(43,33,64,.2)); }
+.pointer {
+  position: absolute; top: -18px; left: 50%; width: 48px; height: 60px;
+  transform: translateX(-50%); transform-origin: 50% 20%; z-index: 3;
+}
+.pointer.tick { animation: tick .12s ease-out; }
+@keyframes tick { 40% { transform: translateX(-50%) rotate(-16deg); } }
+.hub {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 26%; aspect-ratio: 1; border-radius: 50%; z-index: 2;
+  border: 5px solid var(--ink); background: var(--btn); color: #fff; cursor: pointer;
+  font: 800 clamp(1rem, 4.6vw, 1.35rem)/1 var(--font-display); letter-spacing: 0.04em;
+  box-shadow: inset 0 -6px 0 var(--btn-dark), 0 4px 0 var(--ink);
+  padding-top: 4px;
+}
+.hub:hover:not(:disabled) { filter: brightness(1.06); }
+.hub:active:not(:disabled) { transform: translate(-50%, -46%); box-shadow: inset 0 -3px 0 var(--btn-dark), 0 1px 0 var(--ink); }
+.hub:disabled { cursor: default; background: var(--ink-soft); box-shadow: inset 0 -6px 0 rgba(0,0,0,.2), 0 4px 0 var(--ink); }
+.hub:focus-visible, .spin:focus-visible, .again:focus-visible, .done:focus-visible, .sound:focus-visible { outline: 4px solid var(--btn); outline-offset: 3px; }
+
+.spin {
+  font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; letter-spacing: 0.05em;
+  color: #fff; background: var(--btn); border: 3px solid var(--ink); border-radius: 999px;
+  padding: 10px 54px 5px; cursor: pointer; margin-top: 4px;
+  box-shadow: 0 6px 0 var(--ink);
+  animation: pulse 2.2s ease-in-out infinite;
+}
+.spin:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink); }
+.spin:disabled { opacity: .55; cursor: default; animation: none; }
+@keyframes pulse { 50% { transform: scale(1.05); } }
+.hint { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--ink-soft); min-height: 1.4em; }
+
+.recent { width: 100%; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.recent h2 { margin: 0; font: 800 0.72rem var(--font-body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-height: 32px; }
+.chip {
+  font-weight: 800; font-size: 0.85rem; padding: 4px 10px; border-radius: 999px;
+  border: 2px solid var(--ink); background: var(--c, #fff);
+}
+.chips .empty { font-size: 0.85rem; color: var(--ink-soft); align-self: center; }
+
+/* Result pop-up */
+.overlay {
+  position: fixed; inset: 0; z-index: 20; background: rgba(43,33,64,.6);
+  display: grid; place-items: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px;
+  overflow-y: auto;
+  animation: fade .25s ease-out;
+}
+@keyframes fade { from { opacity: 0; } }
+.card {
+  width: min(100%, 400px); background: var(--card); border: 4px solid var(--ink); border-radius: 28px;
+  overflow: hidden; box-shadow: 0 10px 0 var(--ink);
+  animation: pop .5s cubic-bezier(.2,1.5,.4,1);
+}
+@keyframes pop { from { transform: scale(.5) rotate(-6deg); opacity: 0; } }
+.card-top {
+  position: relative; background: var(--mood, #ffc93c);
+  padding-block: 22px 18px; padding-inline: 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border-bottom: 4px solid var(--ink);
+  background-image: repeating-conic-gradient(rgba(255,255,255,.22) 0deg 12deg, transparent 12deg 24deg);
+  background-position: center;
+}
+.card-emoji { font-size: 4.4rem; line-height: 1; animation: bounce 1.2s ease-in-out .4s infinite; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px) rotate(-6deg); } 60% { transform: translateY(0) rotate(4deg); } }
+.card-congrats {
+  margin: 8px 0 0; font: 800 1.55rem/1 var(--font-display); color: #fff;
+  -webkit-text-stroke: 1.2px var(--ink); text-shadow: 2px 2px 0 var(--ink); letter-spacing: 0.02em;
+}
+.card-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.card-spun { margin: 0; font-weight: 700; color: var(--ink-soft); }
+.card-mood { display: block; font: 800 2.6rem/1 var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); margin-top: 4px; }
+.steps {
+  list-style: none; margin: 0; padding: 6px 14px; text-align: left;
+  border: 2px dashed var(--ink); border-radius: 16px; background: #fffaf0;
+  display: flex; flex-direction: column;
+}
+.steps li { display: flex; gap: 12px; align-items: flex-start; padding-block: 8px; line-height: 1.45; font-size: 0.97rem; }
+.steps li + li { border-top: 1.5px solid #f0e2c2; }
+.step-icon { font-size: 1.5rem; line-height: 1; flex: none; margin-top: 2px; }
+.task-text { min-width: 0; margin: 0; }
+.task-text b { display: block; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 2px; }
+.actions { display: flex; gap: 10px; }
+.actions button {
+  flex: 1; font: 800 1.1rem var(--font-display); border: 3px solid var(--ink); border-radius: 999px;
+  padding: 9px 12px 5px; cursor: pointer; box-shadow: 0 4px 0 var(--ink);
+}
+.actions button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.done { background: var(--card); color: var(--ink); }
+.again { background: var(--btn); color: #fff; }
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 25; width: 100%; height: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  body::after, .spin, .card, .card-emoji, .overlay, .pointer.tick { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<main>
+  <div class="topbar"><button class="sound" id="sound" type="button" aria-pressed="true">🔊 Sound on</button></div>
+  <header>
+    <p class="eyebrow">Feelings Challenge</p>
+    <h1>Mood Spinner</h1>
+    <p class="lead">Spin the wheel, get a mood, record your video!</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <svg class="pointer" id="pointer" viewBox="0 0 48 60" aria-hidden="true">
+      <path d="M24 58 L6 18 A18 18 0 1 1 42 18 Z" fill="#ff4f6d" stroke="#2b2140" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="24" cy="18" r="6" fill="#fff6a8" stroke="#2b2140" stroke-width="3"/>
+    </svg>
+    <canvas id="wheel" width="880" height="880" role="img" aria-label="Wheel with 8 moods: Happy, Sad, Angry, Stress, Grateful, Nervous, Calm, Excited"></canvas>
+    <button class="hub" id="hub" type="button" aria-label="Spin the wheel">SPIN</button>
+  </div>
+
+  <button class="spin" id="spin" type="button">SPIN!</button>
+  <p class="hint" id="hint" aria-live="polite">Tap SPIN to find your mood.</p>
+
+  <section class="recent" aria-label="Recent spins">
+    <h2>Recent spins</h2>
+    <div class="chips" id="chips"><span class="empty">No spins yet</span></div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="mood-name">
+    <div class="card-top" id="card-top">
+      <div class="card-emoji" id="mood-emoji">😄</div>
+      <p class="card-congrats">Congratulations!</p>
+    </div>
+    <div class="card-body">
+      <p class="card-spun">You spun <span class="card-mood" id="mood-name">Happy</span></p>
+      <ol class="steps">
+        <li><span class="step-icon" aria-hidden="true">🎬</span><p class="task-text"><b>Step 1 · Record</b><span id="mood-task"></span></p></li>
+        <li><span class="step-icon" aria-hidden="true">📸</span><p class="task-text"><b>Step 2 · Post</b>Share your video on Instagram.</p></li>
+        <li><span class="step-icon" aria-hidden="true">🧧</span><p class="task-text"><b>Step 3 · Tag</b>Tag 5 friends so they can join the TNG eWallet Angpow event too!</p></li>
+      </ol>
+      <div class="actions">
+        <button class="done" id="done" type="button">Got it!</button>
+        <button class="again" id="again" type="button">Spin again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+const MOODS = [
+  { name: "Happy",    emoji: "😄", color: "#ffc93c", task: "Record a short video that shows you feeling HAPPY! Act out a joyful moment, like getting great news or winning a game." },
+  { name: "Sad",      emoji: "😢", color: "#6ea8fe", task: "Record a short video that shows you feeling SAD. Act out a moment like losing something special or missing a friend." },
+  { name: "Angry",    emoji: "😠", color: "#ff6b5b", task: "Record a short video that shows you feeling ANGRY (safely!). Act out a moment like when something feels unfair." },
+  { name: "Stress",   emoji: "😫", color: "#b99cff", task: "Record a short video that shows you feeling STRESSED. Act out a moment like having lots of homework due tomorrow." },
+  { name: "Grateful", emoji: "🙏", color: "#7ed6a5", task: "Record a short video that shows you feeling GRATEFUL. Act out a moment like thanking a friend who helped you." },
+  { name: "Nervous",  emoji: "😬", color: "#ffa45c", task: "Record a short video that shows you feeling NERVOUS. Act out a moment like waiting to give a speech in class." },
+  { name: "Calm",     emoji: "😌", color: "#5ccfd6", task: "Record a short video that shows you feeling CALM. Act out a peaceful moment like relaxing on a quiet afternoon." },
+  { name: "Excited",  emoji: "🤩", color: "#ff7eb6", task: "Record a short video that shows you feeling EXCITED! Act out a moment like the first day of the school holidays." }
+];
+const N = MOODS.length, TAU = Math.PI * 2, SLICE = TAU / N;
+const $ = id => document.getElementById(id);
+const wheel = $("wheel"), ctx = wheel.getContext("2d");
+const S = wheel.width, C = S / 2;
+const RIM = C - 6, FACE = C - 52, BULBS = 24;
+let rotation = 0, spinning = false, lastIdx = 0, soundOn = true, audio = null;
+const recent = [];
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const f = v => Math.max(0, Math.min(255, Math.round(v + amt)));
+  return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`;
+}
+
+function draw(now = 0) {
+  ctx.clearRect(0, 0, S, S);
+  // rim
+  ctx.beginPath(); ctx.arc(C, C, RIM, 0, TAU); ctx.fillStyle = "#2b2140"; ctx.fill();
+  // bulbs
+  for (let b = 0; b < BULBS; b++) {
+    const a = b / BULBS * TAU;
+    const x = C + Math.cos(a) * (RIM - 23), y = C + Math.sin(a) * (RIM - 23);
+    const lit = spinning ? ((b + Math.floor(now / 90)) % 2 === 0) : ((b + Math.floor(now / 600)) % 3 !== 0);
+    ctx.beginPath(); ctx.arc(x, y, 10, 0, TAU);
+    ctx.fillStyle = lit ? "#fff6a8" : "#8a7aa8";
+    if (lit) { ctx.shadowColor = "#fff6a8"; ctx.shadowBlur = 18; }
+    ctx.fill(); ctx.shadowBlur = 0;
+  }
+  // slices
+  ctx.save(); ctx.translate(C, C); ctx.rotate(rotation);
+  for (let i = 0; i < N; i++) {
+    const start = -Math.PI / 2 + i * SLICE - SLICE / 2;
+    const g = ctx.createRadialGradient(0, 0, FACE * 0.15, 0, 0, FACE);
+    g.addColorStop(0, shade(MOODS[i].color, 40));
+    g.addColorStop(1, MOODS[i].color);
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, FACE, start, start + SLICE); ctx.closePath();
+    ctx.fillStyle = g; ctx.fill();
+    ctx.lineWidth = 7; ctx.strokeStyle = "#2b2140"; ctx.stroke();
+
+    ctx.save(); ctx.rotate(start + SLICE / 2);
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.font = "800 44px 'Baloo 2', 'Trebuchet MS', sans-serif";
+    ctx.lineWidth = 8; ctx.strokeStyle = "rgba(255,255,255,.75)"; ctx.lineJoin = "round";
+    ctx.strokeText(MOODS[i].name, FACE - 26, 5);
+    ctx.fillStyle = "#2b2140"; ctx.fillText(MOODS[i].name, FACE - 26, 5);
+    ctx.font = "50px system-ui, 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
+    ctx.fillText(MOODS[i].emoji, FACE * 0.5, 3);
+    ctx.restore();
+  }
+  ctx.restore();
+  // inner ring
+  ctx.beginPath(); ctx.arc(C, C, FACE, 0, TAU); ctx.lineWidth = 8; ctx.strokeStyle = "#2b2140"; ctx.stroke();
+}
+
+// gentle idle twinkle
+(function idle(now) { if (!spinning) draw(now); requestAnimationFrame(idle); })(0);
+
+function ensureAudio() {
+  if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audio = null; } }
+  if (audio && audio.state === "suspended") audio.resume().catch(() => {});
+}
+function beep(freq, dur, type = "square", vol = 0.05) {
+  if (!soundOn || !audio) return;
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, audio.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + dur);
+  o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + dur);
+}
+function fanfare() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.22, "triangle", 0.08), i * 110)); }
+
+const idxAt = rot => ((Math.round(-rot / SLICE) % N) + N) % N;
+const easeOut = t => 1 - Math.pow(1 - t, 4);
+
+function setBusy(b) {
+  spinning = b;
+  $("spin").disabled = b; $("hub").disabled = b;
+}
+
+function spin() {
+  if (spinning) return;
+  ensureAudio();
+  setBusy(true);
+  $("hint").textContent = "Spinning… 🤞";
+  const pick = Math.floor(Math.random() * N);
+  const jitter = (Math.random() - 0.5) * SLICE * 0.7;
+  const current = ((rotation % TAU) + TAU) % TAU;
+  let target = (((-pick * SLICE + jitter) % TAU) + TAU) % TAU;
+  let delta = target - current; if (delta < 0) delta += TAU;
+  const turns = reduceMotion ? 1 : 6 + Math.floor(Math.random() * 3);
+  const total = delta + turns * TAU, startRot = rotation;
+  const duration = reduceMotion ? 900 : 5000, t0 = performance.now();
+  lastIdx = idxAt(rotation);
+  const ptr = $("pointer");
+  function frame(now) {
+    const t = Math.min(1, (now - t0) / duration);
+    rotation = startRot + total * easeOut(t);
+    draw(now);
+    const idx = idxAt(rotation + SLICE / 2);
+    if (idx !== lastIdx) {
+      lastIdx = idx;
+      beep(900, 0.03);
+      ptr.classList.remove("tick"); void ptr.getBoundingClientRect(); ptr.classList.add("tick");
+    }
+    if (t < 1) requestAnimationFrame(frame); else finish(pick);
+  }
+  requestAnimationFrame(frame);
+}
+
+function finish(i) {
+  const m = MOODS[i];
+  recent.unshift(m); if (recent.length > 6) recent.pop();
+  renderChips();
+  setTimeout(() => {
+    $("card-top").style.setProperty("--mood", m.color);
+    $("mood-emoji").textContent = m.emoji;
+    $("mood-name").textContent = m.name;
+    $("mood-task").textContent = m.task;
+    $("overlay").hidden = false;
+    $("hint").textContent = "You got " + m.name + " " + m.emoji;
+    $("done").focus();
+    fanfare();
+    if (!reduceMotion) confetti(m.color);
+  }, 350);
+}
+
+function renderChips() {
+  const box = $("chips"); box.innerHTML = "";
+  recent.forEach(m => {
+    const s = document.createElement("span");
+    s.className = "chip"; s.style.setProperty("--c", m.color);
+    s.textContent = m.emoji + " " + m.name;
+    box.appendChild(s);
+  });
+}
+
+function closeCard(thenSpin) {
+  $("overlay").hidden = true;
+  setBusy(false);
+  $("hint").textContent = "Tap SPIN to find your mood.";
+  if (thenSpin) setTimeout(spin, 150); else $("spin").focus();
+}
+
+// confetti
+const cf = $("confetti"), cx = cf.getContext("2d");
+function confetti(main) {
+  const dpr = window.devicePixelRatio || 1;
+  cf.width = innerWidth * dpr; cf.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const colors = [main, "#ffc93c", "#ff4f6d", "#5ccfd6", "#b99cff", "#7ed6a5", "#ffffff"];
+  const parts = [];
+  for (let k = 0; k < 2; k++) for (let j = 0; j < 80; j++) parts.push({
+    x: k ? innerWidth + 10 : -10, y: innerHeight * 0.75,
+    vx: (k ? -1 : 1) * (6 + Math.random() * 9), vy: -12 - Math.random() * 10,
+    s: 7 + Math.random() * 7, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4,
+    c: colors[Math.floor(Math.random() * colors.length)]
+  });
+  const t0 = performance.now();
+  (function tick(now) {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    parts.forEach(p => {
+      p.vy += 0.32; p.vx *= 0.985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r);
+      cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * 0.6); cx.restore();
+    });
+    if (now - t0 < 3200) requestAnimationFrame(tick); else cx.clearRect(0, 0, innerWidth, innerHeight);
+  })(t0);
+}
+
+$("spin").addEventListener("click", spin);
+$("hub").addEventListener("click", spin);
+$("done").addEventListener("click", () => closeCard(false));
+$("again").addEventListener("click", () => closeCard(true));
+$("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closeCard(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("overlay").hidden) closeCard(false); });
+$("sound").addEventListener("click", () => {
+  soundOn = !soundOn;
+  $("sound").textContent = soundOn ? "🔊 Sound on" : "🔇 Sound off";
+  $("sound").setAttribute("aria-pressed", String(soundOn));
+  if (soundOn) ensureAudio();
+});
+
+draw();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => draw());
+</script>
+</body>
+</html>
