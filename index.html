@@ -269,7 +269,7 @@ h1 {
         <p class="prize"><b>Stand a chance to win prizes worth RM760!</b>RM100 TNG eWallet Red Packet Giveaway + 3 Exclusive Consultations Worth RM220 Each</p>
         <h3>1. Game Rules</h3>
         <ol class="rules">
-          <li><span class="num">Step 1</span><div><b>Spin the Emotion Wheel</b><p>Scan the QR code and spin the wheel to receive one of eight emotions: Happy, Sad, Angry, Stressed, Excited, Calm, Grateful or Nervous.</p></div></li>
+          <li><span class="num">Step 1</span><div><b>Spin the Emotion Wheel</b><p>Scan the QR code and spin the wheel to receive one of nine emotions: Happy, Sad, Angry, Stressed, Excited, Calm, Grateful, Nervous or Loved.</p></div></li>
           <li><span class="num">Step 2</span><div><b>Create Your Photo Content</b><p>Take one original and creative photo that represents your selected emotion. Only photos are accepted; videos are not allowed.</p></div></li>
           <li><span class="num">Step 3</span><div><b>Share on Instagram Story</b><p>Upload your photo to your Instagram Story with a short description (1–3 sentences) explaining your selected emotion and the story behind your photo. Please set your Instagram to a public account.</p></div></li>
           <li><span class="num">Step 4</span><div><b>Tag &amp; Invite Friends</b><p>Tag MT Alchemy's official Instagram account and at least 3 friends in your Instagram Story.</p></div></li>
@@ -333,7 +333,7 @@ h1 {
       <path d="M24 58 L6 18 A18 18 0 1 1 42 18 Z" fill="#ff4f6d" stroke="#2b2140" stroke-width="4" stroke-linejoin="round"/>
       <circle cx="24" cy="18" r="6" fill="#fff6a8" stroke="#2b2140" stroke-width="3"/>
     </svg>
-    <canvas id="wheel" width="880" height="880" role="img" aria-label="Wheel with 8 emotions: Happy, Sad, Angry, Stressed, Grateful, Nervous, Calm, Excited"></canvas>
+    <canvas id="wheel" width="880" height="880" role="img" aria-label="Wheel with 9 emotions: Happy, Sad, Angry, Stressed, Grateful, Loved, Nervous, Calm, Excited"></canvas>
     <button class="hub" id="hub" type="button" aria-label="Spin the wheel">SPIN</button>
   </div>
 
@@ -353,7 +353,7 @@ h1 {
       <p class="card-spun">You spun <span class="card-mood" id="mood-name">Happy</span></p>
       <ol class="steps">
         <li><span class="step-icon" aria-hidden="true">📷</span><p class="task-text"><b>Step 1 · Photo</b><span id="mood-task"></span></p></li>
-        <li><span class="step-icon" aria-hidden="true">📲</span><p class="task-text"><b>Step 2 · Share</b>Upload your photo into the IG template provided by us, add a 1–3 sentence description, then share it on your Instagram Story and save it to Highlights.</p></li>
+        <li><span class="step-icon" aria-hidden="true">📲</span><p class="task-text"><b>Step 2 · Share</b>Upload your photo to your Instagram Story with a short description (1–3 sentences) explaining your selected emotion and the story behind your photo. Please set your Instagram to a public account.</p></li>
         <li><span class="step-icon" aria-hidden="true">🏷️</span><p class="task-text"><b>Step 3 · Tag</b>Tag MT Alchemy's official Instagram account and 3 friends so they can join too and stand a chance to win rewards (TNG eWallet Red Packet and exclusive consultation)!</p></li>
         <li><span class="step-icon" aria-hidden="true">💬</span><p class="task-text"><b>Step 4 · Join</b>Join the official MT Alchemy WhatsApp group for updates and prize announcements.</p></li>
       </ol>
@@ -374,6 +374,7 @@ const MOODS = [
   { name: "Angry",    emoji: "😠", color: "#ff6b5b", task: "Take one original, creative photo that shows ANGRY, like when something feels unfair." },
   { name: "Stressed", emoji: "😫", color: "#b99cff", task: "Take one original, creative photo that shows STRESSED, like having lots of work due tomorrow." },
   { name: "Grateful", emoji: "🙏", color: "#7ed6a5", task: "Take one original, creative photo that shows GRATEFUL, like thanking a friend who helped you." },
+  { name: "Loved",    emoji: "🥰", color: "#ffb3c6", task: "Take one original, creative photo that shows LOVED, like a warm hug or a handwritten note from someone." },
   { name: "Nervous",  emoji: "😬", color: "#ffa45c", task: "Take one original, creative photo that shows NERVOUS, like waiting to give a speech." },
   { name: "Calm",     emoji: "😌", color: "#5ccfd6", task: "Take one original, creative photo that shows CALM, like relaxing on a quiet afternoon." },
   { name: "Excited",  emoji: "🤩", color: "#ff7eb6", task: "Take one original, creative photo that shows EXCITED, like the first day of a holiday." }
@@ -420,7 +421,7 @@ function draw(now = 0) {
 
     ctx.save(); ctx.rotate(start + SLICE / 2);
     ctx.textAlign = "right"; ctx.textBaseline = "middle";
-    ctx.font = "800 42px 'Baloo 2', 'Trebuchet MS', sans-serif";
+    ctx.font = "800 40px 'Baloo 2', 'Trebuchet MS', sans-serif";
     ctx.lineWidth = 8; ctx.strokeStyle = "rgba(255,255,255,.75)"; ctx.lineJoin = "round";
     ctx.strokeText(MOODS[i].name, FACE - 26, 5);
     ctx.fillStyle = "#2b2140"; ctx.fillText(MOODS[i].name, FACE - 26, 5);
