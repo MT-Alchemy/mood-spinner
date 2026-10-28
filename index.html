@@ -119,7 +119,7 @@ h1 {
 /* Result pop-up */
 .overlay {
   position: fixed; inset: 0; z-index: 20; background: rgba(43,33,64,.6);
-  display: grid; place-items: center;
+  display: flex; flex-direction: column;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 16px;
@@ -128,7 +128,7 @@ h1 {
 }
 @keyframes fade { from { opacity: 0; } }
 .card {
-  width: min(100%, 400px); background: var(--card); border: 4px solid var(--ink); border-radius: 28px;
+  width: min(100%, 400px); margin: auto; flex: none; background: var(--card); border: 4px solid var(--ink); border-radius: 28px;
   overflow: hidden; box-shadow: 0 10px 0 var(--ink);
   animation: pop .5s cubic-bezier(.2,1.5,.4,1);
 }
@@ -171,6 +171,80 @@ h1 {
 
 #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 25; width: 100%; height: 100%; }
 
+/* Terms & Conditions gate */
+.gate {
+  position: fixed; inset: 0; z-index: 40; background: var(--bg);
+  display: grid; place-items: center;
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
+  padding-block: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-bottom, 0px));
+}
+.tnc {
+  width: min(100%, 560px); max-height: 100%;
+  background: var(--card); border: 4px solid var(--ink); border-radius: 24px;
+  box-shadow: 0 8px 0 var(--ink);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.tnc-head {
+  background: var(--ink); color: #fff; text-align: center;
+  padding: 12px 18px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  flex: none;
+}
+.tnc-head .brand { margin: 0; font: 800 .72rem var(--font-body); letter-spacing: .18em; text-transform: uppercase; color: var(--bulb-on); }
+.tnc-head h2 { margin: 0; font: 800 clamp(1.25rem, 5.4vw, 1.55rem)/1.15 var(--font-display); text-wrap: balance; }
+.tnc-head .tag { margin: 0; font-size: .9rem; font-weight: 700; opacity: .85; }
+.prize {
+  margin: 0 0 16px; text-align: center; background: var(--btn); color: #fff; border-radius: 14px; padding: 6px 12px;
+  font-size: .82rem; font-weight: 700; line-height: 1.35;
+}
+.prize b { display: block; font: 800 1.05rem var(--font-display); letter-spacing: .02em; }
+.tnc-progress {
+  flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 18px; border-bottom: 2px dashed #ecdcbf; font-weight: 800; font-size: .85rem; color: var(--ink-soft);
+}
+.dots { display: flex; gap: 6px; }
+.dots i { width: 26px; height: 8px; border-radius: 999px; background: #ecdcbf; }
+.dots i.on { background: var(--btn); }
+.tnc-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 16px 20px 18px; text-align: left; line-height: 1.55; font-size: .95rem;
+}
+.tnc-body h3 { margin: 0 0 10px; font: 800 1.15rem var(--font-display); color: var(--ink); }
+.tnc-body h3:not(:first-child) { margin-top: 20px; }
+.rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.rules li { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; }
+.rules .num {
+  font: 800 .78rem var(--font-body); background: var(--ink); color: var(--bulb-on);
+  border-radius: 999px; padding: 3px 9px 2px; margin-top: 2px; white-space: nowrap;
+}
+.rules b { display: block; }
+.rules p { margin: 2px 0 0; color: var(--ink-soft); }
+.terms { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 8px; }
+.terms li::marker { font-weight: 800; color: var(--btn-dark); }
+.terms li.new { background: #fff1c2; border-radius: 8px; padding: 2px 6px; margin-left: -6px; }
+.consent { margin: 0; color: var(--ink-soft); }
+.motto { margin: 16px 0 0; text-align: center; font: 800 .95rem var(--font-display); color: var(--btn-dark); }
+.tnc-foot {
+  flex: none; border-top: 2px solid #f0e2c2; padding: 12px 18px 16px;
+  display: flex; flex-direction: column; gap: 12px; background: #fffaf0;
+}
+.agree { display: flex; gap: 10px; align-items: flex-start; font-weight: 700; font-size: .92rem; line-height: 1.4; cursor: pointer; text-align: left; }
+.agree input { width: 22px; height: 22px; flex: none; margin: 0; accent-color: var(--btn); cursor: pointer; }
+.nav { display: flex; gap: 10px; }
+.nav button {
+  flex: 1; font: 800 1.1rem var(--font-display); border: 3px solid var(--ink); border-radius: 999px;
+  padding: 9px 14px 5px; cursor: pointer; box-shadow: 0 4px 0 var(--ink);
+}
+.nav button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.nav .back { background: var(--card); color: var(--ink); flex: 0 0 auto; }
+.nav .next, .nav .submit { background: var(--btn); color: #fff; }
+.nav .submit:disabled { background: #d9cfe0; color: #8a7aa8; border-color: #b8a9c9; box-shadow: 0 4px 0 #b8a9c9; cursor: not-allowed; }
+.nav button:focus-visible, .agree input:focus-visible { outline: 4px solid var(--btn); outline-offset: 3px; }
+.foot-note { margin: -4px 0 0; font-size: .8rem; color: var(--ink-soft); text-align: center; }
+.after { margin: 0; font-size: .92rem; font-weight: 800; color: var(--btn-dark); text-align: center; }
+.again-view { font: 800 1rem var(--font-display); background: var(--card); color: var(--ink); border: 3px solid var(--ink); border-radius: 999px; padding: 8px 20px 4px; cursor: pointer; box-shadow: 0 4px 0 var(--ink); }
+.again-view:focus-visible { outline: 4px solid var(--btn); outline-offset: 3px; }
+
 @media (prefers-reduced-motion: reduce) {
   body::after, .spin, .card, .card-emoji, .overlay, .pointer.tick { animation: none; }
 }
@@ -178,12 +252,80 @@ h1 {
 </head>
 <body>
 
-<main>
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="tnc-title">
+  <div class="tnc">
+    <div class="tnc-head">
+      <p class="brand">Terms &amp; Conditions</p>
+      <h2 id="tnc-title">MT Alchemy – Emotion Spin &amp; Win Challenge</h2>
+      <p class="tag">Small Actions, Stronger Connections</p>
+    </div>
+    <div class="tnc-progress">
+      <span id="page-label">Page 1 of 2 · Game Rules</span>
+      <span class="dots" aria-hidden="true"><i class="on" id="dot1"></i><i id="dot2"></i></span>
+    </div>
+
+    <div class="tnc-body" id="tnc-body" tabindex="0">
+      <section id="page1">
+        <p class="prize"><b>Stand a chance to win prizes worth RM760!</b>RM100 TNG eWallet Red Packet Giveaway + 3 Exclusive Consultations Worth RM220 Each</p>
+        <h3>1. Game Rules</h3>
+        <ol class="rules">
+          <li><span class="num">Step 1</span><div><b>Spin the Emotion Wheel</b><p>Scan the QR code and spin the wheel to receive one of eight emotions: Happy, Sad, Angry, Stressed, Excited, Calm, Grateful or Nervous.</p></div></li>
+          <li><span class="num">Step 2</span><div><b>Create Your Photo Content</b><p>Take one original and creative photo that represents your selected emotion. Only photos are accepted; videos are not allowed.</p></div></li>
+          <li><span class="num">Step 3</span><div><b>Share on Instagram Story</b><p>Upload your photo to your Instagram Story with a short description (1–3 sentences) explaining your selected emotion and the story behind your photo. Save your Story to your Instagram Highlights.</p></div></li>
+          <li><span class="num">Step 4</span><div><b>Tag &amp; Invite Friends</b><p>Tag MT Alchemy's official Instagram account and at least 3 friends in your Instagram Story.</p></div></li>
+          <li><span class="num">Step 5</span><div><b>Join the WhatsApp Group</b><p>Join the official MT Alchemy WhatsApp group to receive campaign updates and prize announcements.</p></div></li>
+          <li><span class="num">Step 6</span><div><b>Stand a Chance to Win</b><p>Complete all the required steps to qualify for a chance to win prizes worth RM760!</p></div></li>
+        </ol>
+      </section>
+
+      <section id="page2" hidden>
+        <h3>2. Terms &amp; Conditions</h3>
+        <ol class="terms">
+          <li>Participants must complete all Game Rules, including joining the official WhatsApp group. Incomplete entries will not be eligible for prizes.</li>
+          <li>Each participant may spin the wheel and participate only once. Multiple attempts or duplicate entries are not allowed.</li>
+          <li>Only original photo submissions are accepted. Videos are not eligible.</li>
+          <li>Each Instagram Story must include a short description (1–3 sentences) explaining the selected emotion and the story behind the photo.</li>
+          <li>Participants must upload their photo to Instagram Story, tag MT Alchemy's official Instagram account and at least 3 friends.</li>
+          <li>Participants must keep their Instagram accounts public during verification and save their submitted Stories in Instagram Highlights until the campaign results are announced.</li>
+          <li>Participants must obtain permission from anyone clearly featured in their submitted photos.</li>
+          <li>By participating, participants agree to allow MT Alchemy to repost and share their submitted photos and descriptions on its official social media platforms for campaign and promotional purposes.</li>
+          <li>Prize Details: The total prize value is RM760, including an RM100 Touch 'n Go (TNG) eWallet Red Packet Giveaway for 30 participants and 3 exclusive MT Alchemy consultation opportunities worth RM220 each. All eligible participants have a chance to win, subject to prize availability.</li>
+          <li>Prizes are non-transferable and cannot be exchanged for cash unless otherwise stated.</li>
+          <li>MT Alchemy reserves the right to disqualify participants with incomplete, fraudulent, duplicated or deleted submissions.</li>
+          <li>Campaign dates, prize details and winner announcements will be communicated through MT Alchemy's official channels, including the WhatsApp group.</li>
+          <li>MT Alchemy reserves the right to make final decisions on the interpretation and application of these rules, subject to applicable law.</li>
+          <li>This campaign is not sponsored, endorsed, administered by or associated with Instagram.</li>
+          <li>Participants must upload their photo with the description using the Instagram template provided by MT Alchemy.</li>
+        </ol>
+
+        <h3>3. Photo Consent Agreement</h3>
+        <p class="consent">By participating in this challenge, I agree to allow MT Alchemy to repost, share and use my submitted photo and description on its official social media platforms for campaign and promotional purposes.</p>
+        <p class="consent" style="margin-top:8px">Participation in this challenge indicates acceptance of the Game Rules, Terms &amp; Conditions and Photo Consent Agreement.</p>
+        <p class="motto">Spin an Emotion. Share Your Story. Spread Positivity.</p>
+      </section>
+    </div>
+
+    <div class="tnc-foot">
+      <label class="agree" id="agree-row" hidden>
+        <input type="checkbox" id="agree">
+        <span>I have read and agree to the Game Rules, Terms &amp; Conditions and Photo Consent Agreement.</span>
+      </label>
+      <div class="nav">
+        <button class="back" id="back" type="button" hidden>← Back</button>
+        <button class="next" id="next" type="button">Next →</button>
+        <button class="submit" id="submit" type="button" hidden disabled>I Agree &amp; Submit</button>
+      </div>
+      <p class="foot-note" id="foot-note">Please read both pages to continue.</p>
+    </div>
+  </div>
+</div>
+
+<main id="app" aria-hidden="true">
   <div class="topbar"><button class="sound" id="sound" type="button" aria-pressed="true">🔊 Sound on</button></div>
   <header>
-    <p class="eyebrow">Feelings Challenge</p>
+    <p class="eyebrow">MT Alchemy · Spin &amp; Win</p>
     <h1>Mood Spinner</h1>
-    <p class="lead">Spin the wheel, get a mood, record your video!</p>
+    <p class="lead">Spin the wheel, get an emotion, share your photo!</p>
   </header>
 
   <div class="stage" id="stage">
@@ -191,17 +333,14 @@ h1 {
       <path d="M24 58 L6 18 A18 18 0 1 1 42 18 Z" fill="#ff4f6d" stroke="#2b2140" stroke-width="4" stroke-linejoin="round"/>
       <circle cx="24" cy="18" r="6" fill="#fff6a8" stroke="#2b2140" stroke-width="3"/>
     </svg>
-    <canvas id="wheel" width="880" height="880" role="img" aria-label="Wheel with 8 moods: Happy, Sad, Angry, Stress, Grateful, Nervous, Calm, Excited"></canvas>
+    <canvas id="wheel" width="880" height="880" role="img" aria-label="Wheel with 8 emotions: Happy, Sad, Angry, Stressed, Grateful, Nervous, Calm, Excited"></canvas>
     <button class="hub" id="hub" type="button" aria-label="Spin the wheel">SPIN</button>
   </div>
 
   <button class="spin" id="spin" type="button">SPIN!</button>
-  <p class="hint" id="hint" aria-live="polite">Tap SPIN to find your mood.</p>
+  <p class="hint" id="hint" aria-live="polite">Tap SPIN to find your emotion. You get one spin!</p>
 
-  <section class="recent" aria-label="Recent spins">
-    <h2>Recent spins</h2>
-    <div class="chips" id="chips"><span class="empty">No spins yet</span></div>
-  </section>
+  <button class="again-view" id="view" type="button" hidden>See my challenge steps</button>
 </main>
 
 <div class="overlay" id="overlay" hidden>
@@ -213,13 +352,14 @@ h1 {
     <div class="card-body">
       <p class="card-spun">You spun <span class="card-mood" id="mood-name">Happy</span></p>
       <ol class="steps">
-        <li><span class="step-icon" aria-hidden="true">🎬</span><p class="task-text"><b>Step 1 · Record</b><span id="mood-task"></span></p></li>
-        <li><span class="step-icon" aria-hidden="true">📸</span><p class="task-text"><b>Step 2 · Post</b>Share your video on Instagram.</p></li>
-        <li><span class="step-icon" aria-hidden="true">🧧</span><p class="task-text"><b>Step 3 · Tag</b>Tag 5 friends so they can join the TNG eWallet Angpow event too!</p></li>
+        <li><span class="step-icon" aria-hidden="true">📷</span><p class="task-text"><b>Step 1 · Photo</b><span id="mood-task"></span></p></li>
+        <li><span class="step-icon" aria-hidden="true">📲</span><p class="task-text"><b>Step 2 · Share</b>Upload your photo into the IG template provided by us, add a 1–3 sentence description, then share it on your Instagram Story and save it to Highlights.</p></li>
+        <li><span class="step-icon" aria-hidden="true">🏷️</span><p class="task-text"><b>Step 3 · Tag</b>Tag MT Alchemy's official Instagram account and 3 friends so they can join too and stand a chance to win rewards (TNG eWallet Red Packet and exclusive consultation)!</p></li>
+        <li><span class="step-icon" aria-hidden="true">💬</span><p class="task-text"><b>Step 4 · Join</b>Join the official MT Alchemy WhatsApp group for updates and prize announcements.</p></li>
       </ol>
+      <p class="after">🧧 Complete all steps to stand a chance to win prizes worth RM760!</p>
       <div class="actions">
         <button class="done" id="done" type="button">Got it!</button>
-        <button class="again" id="again" type="button">Spin again</button>
       </div>
     </div>
   </div>
@@ -229,21 +369,21 @@ h1 {
 
 <script>
 const MOODS = [
-  { name: "Happy",    emoji: "😄", color: "#ffc93c", task: "Record a short video that shows you feeling HAPPY! Act out a joyful moment, like getting great news or winning a game." },
-  { name: "Sad",      emoji: "😢", color: "#6ea8fe", task: "Record a short video that shows you feeling SAD. Act out a moment like losing something special or missing a friend." },
-  { name: "Angry",    emoji: "😠", color: "#ff6b5b", task: "Record a short video that shows you feeling ANGRY (safely!). Act out a moment like when something feels unfair." },
-  { name: "Stress",   emoji: "😫", color: "#b99cff", task: "Record a short video that shows you feeling STRESSED. Act out a moment like having lots of homework due tomorrow." },
-  { name: "Grateful", emoji: "🙏", color: "#7ed6a5", task: "Record a short video that shows you feeling GRATEFUL. Act out a moment like thanking a friend who helped you." },
-  { name: "Nervous",  emoji: "😬", color: "#ffa45c", task: "Record a short video that shows you feeling NERVOUS. Act out a moment like waiting to give a speech in class." },
-  { name: "Calm",     emoji: "😌", color: "#5ccfd6", task: "Record a short video that shows you feeling CALM. Act out a peaceful moment like relaxing on a quiet afternoon." },
-  { name: "Excited",  emoji: "🤩", color: "#ff7eb6", task: "Record a short video that shows you feeling EXCITED! Act out a moment like the first day of the school holidays." }
+  { name: "Happy",    emoji: "😄", color: "#ffc93c", task: "Take one original, creative photo that shows HAPPY, like getting great news or winning a game." },
+  { name: "Sad",      emoji: "😢", color: "#6ea8fe", task: "Take one original, creative photo that shows SAD, like losing something special or missing a friend." },
+  { name: "Angry",    emoji: "😠", color: "#ff6b5b", task: "Take one original, creative photo that shows ANGRY, like when something feels unfair." },
+  { name: "Stressed", emoji: "😫", color: "#b99cff", task: "Take one original, creative photo that shows STRESSED, like having lots of work due tomorrow." },
+  { name: "Grateful", emoji: "🙏", color: "#7ed6a5", task: "Take one original, creative photo that shows GRATEFUL, like thanking a friend who helped you." },
+  { name: "Nervous",  emoji: "😬", color: "#ffa45c", task: "Take one original, creative photo that shows NERVOUS, like waiting to give a speech." },
+  { name: "Calm",     emoji: "😌", color: "#5ccfd6", task: "Take one original, creative photo that shows CALM, like relaxing on a quiet afternoon." },
+  { name: "Excited",  emoji: "🤩", color: "#ff7eb6", task: "Take one original, creative photo that shows EXCITED, like the first day of a holiday." }
 ];
 const N = MOODS.length, TAU = Math.PI * 2, SLICE = TAU / N;
 const $ = id => document.getElementById(id);
 const wheel = $("wheel"), ctx = wheel.getContext("2d");
 const S = wheel.width, C = S / 2;
 const RIM = C - 6, FACE = C - 52, BULBS = 24;
-let rotation = 0, spinning = false, lastIdx = 0, soundOn = true, audio = null;
+let used = false, rotation = 0, spinning = false, lastIdx = 0, soundOn = true, audio = null;
 const recent = [];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -280,7 +420,7 @@ function draw(now = 0) {
 
     ctx.save(); ctx.rotate(start + SLICE / 2);
     ctx.textAlign = "right"; ctx.textBaseline = "middle";
-    ctx.font = "800 44px 'Baloo 2', 'Trebuchet MS', sans-serif";
+    ctx.font = "800 42px 'Baloo 2', 'Trebuchet MS', sans-serif";
     ctx.lineWidth = 8; ctx.strokeStyle = "rgba(255,255,255,.75)"; ctx.lineJoin = "round";
     ctx.strokeText(MOODS[i].name, FACE - 26, 5);
     ctx.fillStyle = "#2b2140"; ctx.fillText(MOODS[i].name, FACE - 26, 5);
@@ -319,7 +459,7 @@ function setBusy(b) {
 }
 
 function spin() {
-  if (spinning) return;
+  if (spinning || used || !agreed) return;
   ensureAudio();
   setBusy(true);
   $("hint").textContent = "Spinning… 🤞";
@@ -350,8 +490,7 @@ function spin() {
 
 function finish(i) {
   const m = MOODS[i];
-  recent.unshift(m); if (recent.length > 6) recent.pop();
-  renderChips();
+  used = true;
   setTimeout(() => {
     $("card-top").style.setProperty("--mood", m.color);
     $("mood-emoji").textContent = m.emoji;
@@ -375,11 +514,11 @@ function renderChips() {
   });
 }
 
-function closeCard(thenSpin) {
+function closeCard() {
   $("overlay").hidden = true;
-  setBusy(false);
-  $("hint").textContent = "Tap SPIN to find your mood.";
-  if (thenSpin) setTimeout(spin, 150); else $("spin").focus();
+  $("spin").hidden = true; $("hub").disabled = true;
+  $("hint").textContent = "You got " + $("mood-name").textContent + "! Your spin is used. Complete the steps to join.";
+  $("view").hidden = false; $("view").focus();
 }
 
 // confetti
@@ -407,12 +546,34 @@ function confetti(main) {
   })(t0);
 }
 
+// Terms & Conditions gate
+let agreed = false;
+function showPage(n) {
+  $("page1").hidden = n !== 1; $("page2").hidden = n !== 2;
+  $("dot1").classList.toggle("on", true); $("dot2").classList.toggle("on", n === 2);
+  $("page-label").textContent = n === 1 ? "Page 1 of 2 · Game Rules" : "Page 2 of 2 · Terms & Consent";
+  $("next").hidden = n !== 1; $("back").hidden = n !== 2;
+  $("submit").hidden = n !== 2; $("agree-row").hidden = n !== 2;
+  $("foot-note").textContent = n === 1 ? "Please read both pages to continue." : "Tick the box to continue to the spinner.";
+  $("tnc-body").scrollTop = 0;
+}
+$("next").addEventListener("click", () => { showPage(2); $("agree").focus(); });
+$("back").addEventListener("click", () => showPage(1));
+$("agree").addEventListener("change", e => { $("submit").disabled = !e.target.checked; });
+$("submit").addEventListener("click", () => {
+  if (!$("agree").checked) return;
+  agreed = true;
+  $("gate").hidden = true;
+  $("app").removeAttribute("aria-hidden");
+  $("spin").focus();
+});
+
 $("spin").addEventListener("click", spin);
 $("hub").addEventListener("click", spin);
-$("done").addEventListener("click", () => closeCard(false));
-$("again").addEventListener("click", () => closeCard(true));
-$("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closeCard(false); });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("overlay").hidden) closeCard(false); });
+$("done").addEventListener("click", closeCard);
+$("view").addEventListener("click", () => { $("overlay").hidden = false; $("done").focus(); });
+$("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closeCard(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("overlay").hidden) closeCard(); });
 $("sound").addEventListener("click", () => {
   soundOn = !soundOn;
   $("sound").textContent = soundOn ? "🔊 Sound on" : "🔇 Sound off";
